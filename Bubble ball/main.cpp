@@ -20,7 +20,7 @@
 #include "Heart.h"
 #include "Enemy.h"
 #include "Gift.h"
-//#include "GameSound.h"
+#include "GameSound.h"
 
 #define SHOW_MENU 1
 #define PLAY_GAME 2
@@ -56,6 +56,25 @@ void game() {
     //int pointBonus = 0;
     int count = 0;
     //int heart = 3;
+    /*
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile("sound1.wav")) {
+        
+    }
+
+    sf::Sound sound;
+    sound.setBuffer(buffer);
+    */
+
+    //..Music
+    sf::Music music;
+    if (!music.openFromFile("music1.ogg")) {
+        //
+    }
+    music.play();
+    music.setLoop(true);
+
+    
 
     Player player(window.getSize().x, window.getSize().y);
     Heart heart(window.getSize().x, window.getSize().y);
@@ -65,7 +84,7 @@ void game() {
     Menu menu(window.getSize().x, window.getSize().y);
     Leaderboard leaderboard(window.getSize().x, window.getSize().y);
     GameOver gameOver(window.getSize().x, window.getSize().y);
-    //GameSound gameSound(window.getSize().x, window.getSize().y);
+    GameSound gameSound(0);
     
     Gift gift;
     Score score;
@@ -273,6 +292,7 @@ void game() {
                 if (player.collisionNew(gift.sprite)) {
                     gift.setAlive(false);
                     point += 10;
+                    gameSound.play(2);
                 }
 
                 if (gift.sprite.getPosition().y >= window.getSize().y) {
@@ -350,6 +370,8 @@ void game() {
                                     enemys[k].setAlive(false);
                                     bullets[i].setAlive(false);
                                     point++;
+                                    //sound.play();
+                                    gameSound.play(1);
                                 }
                             }
 
@@ -371,6 +393,8 @@ void game() {
                                         player.setAlive(false);
                                         player.setPosition(576, 650);
                                         state = GAME_OVER;
+
+                                        gameSound.play(3);
                                     }
                                     /*
                                     heart--;
@@ -410,6 +434,28 @@ void game() {
 }
 
 int main() {
+    
+    /*
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile("sound1.wav")) {
+        return -1;
+    }
+
+    sf::Sound sound;
+    sound.setBuffer(buffer);
+    sound.play();
+    
+
+    
+    sf::Music music;
+    if (!music.openFromFile("music1.ogg")) {
+        //
+    }
+    music.play();
+    music.setLoop(true);
+    */
+    
+
     game();
     return 0;
 }
