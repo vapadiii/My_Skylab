@@ -145,11 +145,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="Desktop.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="GameOver.cpp" />
+    <ClCompile Include="GameSound.cpp" />
+    <ClCompile Include="Gift.cpp" />
+    <ClCompile Include="Heart.cpp" />
+    <ClCompile Include="Leaderboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Monster.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Score.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bullet.h" />
+    <ClInclude Include="Desktop.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="GameOver.h" />
+    <ClInclude Include="GameSound.h" />
+    <ClInclude Include="Gift.h" />
+    <ClInclude Include="Heart.h" />
+    <ClInclude Include="Leaderboard.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="Monster.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Score.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

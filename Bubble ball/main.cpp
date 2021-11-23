@@ -1,166 +1,415 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include <SFML/Graphics.hpp>
 #include <stdio.h>
-//#include <time.h>
-//#include <string.h>
+#include <time.h>
+#include <string.h>
+#include <conio.h>
 #include <iostream>
+#include <vector>
+#include <fstream>
+#include <SFML/Audio.hpp>
+
 #include "Menu.h"
+#include "Monster.h"
+#include "Desktop.h"
+#include "Score.h"
+#include "Bullet.h"
+#include "GameOver.h"
+#include "Leaderboard.h"
+#include "Player.h"
+#include "Heart.h"
+#include "Enemy.h"
+#include "Gift.h"
+//#include "GameSound.h"
 
-//using namespace sf;
+#define SHOW_MENU 1
+#define PLAY_GAME 2
+#define LEADER_BOARD 3
+#define EXIT 4
+#define GAME_OVER 9
 
-/*
-void login() {
+using namespace std;
+using namespace sf;
 
-    RenderWindow app(VideoMode(400, 400), "Login");
-    char m;
-    char name[30];
-    //char pass[8];
-    printf("Username : ");
-    scanf(" %s", name);
-}
+#define ENEMY_MAX 50
+#define BULLET_MAX 100
 
 void game() {
     srand(time(0));
-
-    RenderWindow app(VideoMode(520, 450), "Bubble ball");
-    app.setFramerateLimit(60);
-
-    Texture t1, t2, t3, t4;
-    t1.loadFromFile("images/block01.png");
-    t2.loadFromFile("images/black_background.jpg");
-    t3.loadFromFile("images/ball.png");
-    t4.loadFromFile("images/paddle.png");
-
-    Sprite sBackground(t2), sBall(t3), sPaddle(t4);
-    sPaddle.setPosition(300, 440);
-
-    Sprite block[1000];
-
-    int n = 0;
-
-    for (int i = 1; i <= 10; i++)
-        for (int j = 1; j <= 10; j++)
-        {
-            block[n].setTexture(t1);
-            block[n].setPosition(i * 43, j * 20);
-            n++;
-        }
-
-    float dx = 6, dy = 5;
-    float x = 300, y = 300;
-
-    while (app.isOpen())
-    {
-        Event e;
-        while (app.pollEvent(e))
-        {
-            if (e.type == Event::Closed)
-                app.close();
-        }
-
-        x += dx;
-        for (int i = 0; i < n; i++)
-            if (FloatRect(x + 3, y + 3, 6, 6).intersects(block[i].getGlobalBounds()))
-            {
-                block[i].setPosition(-100, 0); dx = -dx;
-            }
-
-        y += dy;
-        for (int i = 0; i < n; i++)
-            if (FloatRect(x + 3, y + 3, 6, 6).intersects(block[i].getGlobalBounds()))
-            {
-                block[i].setPosition(-100, 0); dy = -dy;
-            }
-
-        if (x < 0 || x>520)  dx = -dx;
-        if (y < 0 || y>450)  dy = -dy;
-
-        if (Keyboard::isKeyPressed(Keyboard::Right)) sPaddle.move(6, 0);
-        if (Keyboard::isKeyPressed(Keyboard::Left)) sPaddle.move(-6, 0);
-
-        if (FloatRect(x, y, 12, 12).intersects(sPaddle.getGlobalBounds())) dy = -(rand() % 5 + 2);
-
-        sBall.setPosition(x, y);
-
-        app.clear();
-        app.draw(sBackground);
-        app.draw(sBall);
-        app.draw(sPaddle);
-
-        for (int i = 0; i < n; i++)
-            app.draw(block[i]);
-
-        app.display();
-    }
-}
-*/
-
-int main() 
-{
+    sf::RenderWindow window(sf::VideoMode(1152, 800), "SKYLAB");
     
-    sf::RenderWindow window(sf::VideoMode(1080, 720), "Bubble ball");
+    //
+    sf::Clock clock;
+    sf::Clock clock2;
+    //sf::Clock clockBonus;
+    clock.restart();
+    clock2.restart();
 
+    //clockBonus.restart();
+    int state = SHOW_MENU;
+    bool startGame = false;
+    bool shoot = false;
+    int n = 0;
+    int enemyNo = 0;
+    int point = 0;
+
+    //int pointBonus = 0;
+    int count = 0;
+    //int heart = 3;
+
+    Player player(window.getSize().x, window.getSize().y);
+    Heart heart(window.getSize().x, window.getSize().y);
+    Bullet bullets[BULLET_MAX];
+
+    Desktop desktop(window.getSize().x, window.getSize().y);
     Menu menu(window.getSize().x, window.getSize().y);
+    Leaderboard leaderboard(window.getSize().x, window.getSize().y);
+    GameOver gameOver(window.getSize().x, window.getSize().y);
+    //GameSound gameSound(window.getSize().x, window.getSize().y);
+    
+    Gift gift;
+    Score score;
 
-    sf::Texture texture;
-    if (!texture.loadFromFile("playPage.JPG")) {
-        //handle error
-    }
-    sf::Sprite background;
-    background.setTexture(texture);
+    Enemy enemys[ENEMY_MAX];
+    Enemy* abc;
+    std::string playerName;
 
     while (window.isOpen())
     {
         sf::Event event;
         while (window.pollEvent(event))
         {
-            switch (event.type)
+            if (state == GAME_OVER) {
+                if (event.type == sf::Event::TextEntered) {
+                    if (event.KeyPressed == sf::Keyboard::BackSpace && playerName.size() != 0) {
+                        //playerName.pop_back();
+                        //playerName.erase(playerName.size() - 1, 1);
+                        //std::cout << "back space" << std::endl;
+                    }
+                    if (event.text.unicode < 128) {
+                        playerName.push_back((char)event.text.unicode);
+                        std::cout << playerName << std::endl;
+                    }
+                    else {
+                        if (playerName.size() != 0) {
+                            //playerName.pop_back();
+                            playerName.erase(playerName.size() - 1, 1);
+                            std::cout << playerName << std::endl;
+                        }
+                    }
+                    //gameOver.setPlayerName(playerName);
+                }
+            }
+
+            if (event.type == Event::KeyPressed)
             {
-            case sf::Event::KeyReleased:
-                switch (event.key.code) {
-                case sf::Keyboard::Up:
-                    menu.MoveUp();
+                //std::cout << "keyboard press" << std::endl;
+                switch (event.key.code)
+                {
+
+                case sf::Keyboard::BackSpace:
+                    std::cout << "back space" << std::endl;
+                    /*
+                    if (playerName.size() != 0) {
+                        //playerName.pop_back();
+                        playerName.erase(playerName.size() - 1, 1);
+                        std::cout << playerName << std::endl;
+                    }
+                    */
+                    break;
+
+                case sf::Keyboard::Escape:
+                    std::cout << "press key up" << std::endl;
+                    window.close();
+                    // bool alive = !player.isAlive();
+                     //player.setAlive(alive);
+                    break;
+
+                case sf::Keyboard::Space:
+                    std::cout << "space" << std::endl;
+                    shoot = true;
+                    //shoot = !player.isAlive();
+                    //player.setAlive(shoot);
                     break;
 
                 case sf::Keyboard::Down:
+                    std::cout << "press key down" << std::endl;
                     menu.MoveDown();
                     break;
 
-                case sf::Keyboard::Return:
-                    switch (menu.GetPressedItem())
-                    {
-                    case 0 :
-                        std::cout << "Play has been pressed" << std::endl;
-                        //go to state
-                        break;
+                case sf::Keyboard::Up:
+                    std::cout << "press key up" << std::endl;
+                    menu.MoveUp();
+                    break;
 
-                    case 1 :
-                        std::cout << "LeaderBoard has been pressed" << std::endl;
-                        //go to state
-                        break;
+                case sf::Keyboard::Enter:
+                    //std::cout << menu.GetPressedItem() << std::endl;
+                    //menu.GetPressedItem();
+                    if (state == SHOW_MENU) {
+                        int menuSelect = menu.GetPressedItem();
+                        std::cout << menuSelect << std::endl;
+                        if (menuSelect == 0) {
+                            state = PLAY_GAME;
+                            startGame = true;
+                        }
+                        else if (menuSelect == 1) {
+                            state = LEADER_BOARD;
+                        }
+                        else if (menuSelect == 2) {
+                            state = EXIT;
+                            window.close();
+                        }
+                    }
+                    else if (state == LEADER_BOARD) {
+                        state = SHOW_MENU;
+                    }
+                    else {
+                        if (state == GAME_OVER) {
+                            std::cout << "game over" << std::endl;
 
-                    case 2:
-                        window.close();
-                        break;
+                            std::cout << playerName << std::endl;
+                            leaderboard.saveScore(playerName, point);
+
+                            //menuSelect = -1;
+                            state = SHOW_MENU;
+                        }
                     }
                     break;
+                }
+            }
+
+            if (event.type == Event::Closed)
+            {
+                window.close();
+            }
+        }
+        //hamdle
+
+        //window.clear();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+            player.moveLeft();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+            player.moveRight();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+            player.moveUp();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+            player.moveDown();
+        }
+
+        window.clear();
+
+        desktop.draw(window, 1);
+
+        switch (state) {
+        case SHOW_MENU:
+            menu.draw(window);
+            break;
+
+        case LEADER_BOARD:
+            leaderboard.draw(window);
+            break;
+
+        case GAME_OVER:
+            gameOver.draw(window);
+            gameOver.setPlayerName(playerName);
+            break;
+
+        case PLAY_GAME:
+
+            if (startGame) {
+
+                clock.restart();
+                clock2.restart();
+
+                //player
+                player.setAlive(true);
+                player.setPosition(576, 650);
+                playerName = "";
+                //heart = 3;
+                point = 0;
+
+                //..heart
+                heart.initHeart();
+
+                //..gift
+                gift.setAlive(false);
+
+                //enemy
+                for (int i = 0; i < ENEMY_MAX; i++) {
+                    enemys[i].setAlive(false);
+                }
+
+                //bullet
+                for (int i = 0; i < BULLET_MAX; i++) {
+                    bullets[i].setAlive(false);
+                }
+
+
+                startGame = false;
+            }
+
+            heart.draw(window);
+
+            sf::Time t2 = clock2.getElapsedTime();
+            float  numt2 = t2.asSeconds();
+            if (numt2 > 10) {
+
+                if (gift.isAlive() == false) {
+                    gift.setPosition(rand() % window.getSize().x - 100, 0);
+                    gift.setAlive(true);
+                }
+               
+                numt2 = 0;
+                clock2.restart();
+            }
+            
+            if (gift.isAlive()) {
+                gift.draw(window);
+                gift.move();
+
+                if (player.collisionNew(gift.sprite)) {
+                    gift.setAlive(false);
+                    point += 10;
+                }
+
+                if (gift.sprite.getPosition().y >= window.getSize().y) {
+
+                    std::cout << "gift over screen" << std::endl;
+                    gift.setAlive(false);
+
+                }
+            }
+
+            sf::Time t1 = clock.getElapsedTime();
+            //std::cout << t1.asSeconds() << std::endl;
+            float  num = t1.asSeconds();
+
+            if (num > 0.2) {
+
+                if (enemys[enemyNo].isAlive() == false) {
+                    enemys[enemyNo].setPosition(rand() % window.getSize().x - 100, 0);
+                    enemys[enemyNo].setAlive(true);
+                }
+                enemyNo++;
+                if (enemyNo >= ENEMY_MAX) enemyNo = 0;
+
+                for (int i = 0; i < ENEMY_MAX; i++) {
+                    if (enemys[i].isAlive()) {
+                    }
+                    else {
+                        std::cout << t1.asSeconds() << std::endl;
+                        //enemys[i].setPosition(rand() % window.getSize().x - 100, 0);
+                        //enemys[i].setAlive(true);
+                    }
 
                 }
 
-                break;
-
-            case sf::Event::Closed:
-                window.close();
-                break;
+                num = 0;
+                clock.restart();
             }
-        }
-        window.clear();
-        window.draw(background); //draw Background Play Page
-        menu.draw(window);
+
+            score.draw(window, point);
+
+            for (int i = 0; i < ENEMY_MAX; i++) {
+                if (enemys[i].isAlive()) {
+                    enemys[i].draw(window);
+
+                    //enemys[enemyNo].setPosition(rand() % window.getSize().x - 100, 0);
+                   //int nMove = rand() % 1000;
+                    //enemys[i].setDirection(nMove);
+
+                    int nMove = i%5;
+                    enemys[i].move(nMove);
+
+                    if (enemys[i].sprite.getPosition().y >= window.getSize().y) {
+
+                        std::cout << "over screen" << std::endl;
+                        enemys[i].setAlive(false);
+
+                        //enemys[i].setPosition(rand() % window.getSize().x - 100, 0);
+                        //enemys[i].setAlive(true);
+                    }
+                }
+            }
+
+            if (player.isAlive()) {
+                std::cout << "playing" << std::endl;
+                //player.setPosition(540, 550);
+                player.draw(window);
+                for (int i = 0; i < n; i++) {
+                    if (bullets[i].isAlive()) {
+                        bullets[i].draw(window);
+                        bullets[i].sprite.move(0.0, -5);
+
+                        for (int k = 0; k < ENEMY_MAX; k++) {
+                            if (enemys[k].isAlive()) {
+                                if (enemys[k].collision(bullets[i].sprite)) {
+                                    enemys[k].setAlive(false);
+                                    bullets[i].setAlive(false);
+                                    point++;
+                                }
+                            }
+
+                        }
+                    }
+                }
+                for (int k = 0; k < ENEMY_MAX; k++) {
+                    if (enemys[k].isAlive()) {
+                        if (player.collisionNew(enemys[k].sprite)) {
+                            if (player.isBonusTime()) {
+                                enemys[k].setAlive(false);
+                                point++;
+                            }
+                            else {
+                                std::cout << "playing die" << std::endl;
+                                if (!player.isBonusTime()) {
+                                    heart.decrease();
+                                    if (heart.getHeart() == 0) {
+                                        player.setAlive(false);
+                                        player.setPosition(576, 650);
+                                        state = GAME_OVER;
+                                    }
+                                    /*
+                                    heart--;
+                                    if (heart <= 0) {
+                                        player.setAlive(false);
+                                        player.setPosition(576, 650);
+                                        state = GAME_OVER;
+                                    }
+                                    */
+                                }
+                                enemys[k].setAlive(false);
+                            }
+                        }
+                    }
+
+                }
+
+
+                if (shoot) {
+                    if (player.isBonusTime()) {
+                        bullets[n].setPosition(player.getPosition().x + 100, player.getPosition().y - 10);
+                    }
+                    else {
+                        bullets[n].setPosition(player.getPosition().x + 30, player.getPosition().y - 10);
+                        bullets[n].setAlive(true);
+                        n++;
+                        if (n >= 100) n = 0;
+                        shoot = false;
+                    }
+                }
+            }
+
+            break;
+        }   
         window.display();
     }
-    
-    //game();
+}
 
+int main() {
+    game();
     return 0;
 }
