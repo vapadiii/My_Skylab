@@ -16,6 +16,7 @@ private:
 	int selectedItem=0;
 	sf::Font font;
 	sf::Text menu[MAX_ITEMS];
-
+	sf::Text title;
+	sf::Text myname;
 };
 
