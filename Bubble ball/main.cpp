@@ -68,7 +68,7 @@ void game() {
 
     //..Music
     sf::Music music;
-    if (!music.openFromFile("music1.ogg")) {
+    if (!music.openFromFile("music2.ogg")) {
         //
     }
     music.play();
