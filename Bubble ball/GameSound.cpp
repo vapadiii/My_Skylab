@@ -12,17 +12,18 @@ GameSound::GameSound(int no)
 		//
 	}
 
-
+	//.. Monster die
 	if (!buffer.loadFromFile("sound1.wav")) {
 	}
 	sound.setBuffer(buffer);
 
+	//..Gift
 	if (!buffer2.loadFromFile("sound2.wav")) {
 	}
 	sound2.setBuffer(buffer2);
 
-
-	if (!buffer3.loadFromFile("sound3.wav")) {
+	//.. Player die
+	if (!buffer3.loadFromFile("sound4.wav")) {
 	}
 	sound3.setBuffer(buffer3);
 
