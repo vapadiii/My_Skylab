@@ -24,6 +24,7 @@
     <ProjectGuid>{87a3e5a4-4aee-455b-8c8a-0925f6622779}</ProjectGuid>
     <RootNamespace>Bubbleball</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>SkyLab</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
